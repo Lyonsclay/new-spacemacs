@@ -42,6 +42,7 @@ This function should only modify configuration layer settings."
      ;; ----------------------------------------------------------------
      javascript
      flow
+     lsp
      go
      treemacs
      ;; (treemacs :variables
@@ -558,6 +559,19 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+
+  (use-package lsp-mode
+    :commands (lsp lsp-deferred))
+
+  (add-hook 'go-mode-hook #'lsp-deferred)
+
+  ;; optional - provides fancier overlays
+  (use-package lsp-ui
+    :commands lsp-ui-mode)
+
+  ;; if you use company-mode for completion (otherwise, complete-at-point works out of the box):
+  (use-package company-lsp
+    :commands company-lsp)
 
   (add-to-list 'load-path (expand-file-name "lisp" dotspacemacs-directory))
   (let ((default-directory (expand-file-name "packages" dotspacemacs-directory)))
