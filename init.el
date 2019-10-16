@@ -8,7 +8,9 @@ This function should only modify configuration layer settings."
   (setq-default
    ;; Base distribution to use. This is a layer contained in the directory
    ;; `+distribution'. For now available distributions are `spacemacs-base'
-   ;; or `spacemacs'. (default 'spacemacs) dotspacemacs-distribution 'spacemacs
+   ;; or `spacemacs'. (default 'spacemacs)
+   dotspacemacs-distribution 'spacemacs
+
    ;; Lazy installation of layers (i.e. layers are installed only when a file
    ;; with a supported type is opened). Possible values are `all', `unused'
    ;; and `nil'. `unused' will lazy install only unused layers (i.e. layers
@@ -25,12 +27,15 @@ This function should only modify configuration layer settings."
    dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(
-     ;; ----------------------------------------------------------------
+   '(;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
      ;; `M-m f e R' (Emacs style) to install them.
      ;; ----------------------------------------------------------------
+     nginx
+     csv
+     markdown
+     node
      auto-completion
      ;; better-defaults semantic emacs-lisp
      git
@@ -42,15 +47,23 @@ This function should only modify configuration layer settings."
      ;;        shell-default-position 'bottom)
      ;; spell-checking
      syntax-checking
-     ;; lsp
+     lsp
      ;; treemacs
-     ;; (javascript :variables
-     ;;             javascript-backend 'lsp)
-     javascript typescript
+     (javascript :variables
+                 node-add-modules-path t
+                 javascript-backend 'lsp)
+     (typescript :variables
+                 node-add-modules-path t
+                 typescript-backend 'lsp)
      ;; (typescript :variables
      ;;             typescript-fmt-tool 'typescript-formatter)
-     version-control themes-megapack json emoji
-     colors osx yaml
+     version-control
+     themes-megapack
+     json
+     emoji
+     colors
+     osx
+     yaml
      ;; elixir
      ;; erlang
      react
@@ -169,7 +182,7 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(atom-one-dark doom-peacock seti gruvbox-dark-medium dakrone naquadah
+   dotspacemacs-themes '(doom-one atom-one-dark doom-peacock seti gruvbox-dark-medium dakrone naquadah
                                        monokai doom-vibrant)
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `doom', `vim-powerline' and `vanilla'. The
@@ -178,7 +191,7 @@ It should only modify the values of Spacemacs settings."
    ;; refer to the DOCUMENTATION.org for more info on how to create your own
    ;; spaceline theme. Value can be a symbol or list with additional properties.
    ;; (default '(spacemacs :separator wave :separator-scale 1.5))
-   dotspacemacs-mode-line-theme '(spacemacs :separator wave 
+   dotspacemacs-mode-line-theme '(all-the-icons :separator wave 
                                             :separator-scale 1.5)
    ;; If non-nil the cursor color matches the state color in GUI Emacs.
    ;; (default t)
@@ -411,6 +424,20 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+  (eval-after-load 'flycheck
+    '(flycheck-add-mode 'html-tidy 'web-mode))
+
+  ;; https://github.com/flycheck/flycheck/issues/1472#issuecomment-396058812
+  (eval-after-load 'flycheck
+    '(setcar (memq 'source-inplace (flycheck-checker-get 'typescript-tslint 'command)) 'source-original)) 
+  ;; (setq node-add-modules-path t)
+  ;; (eval-after-load 'typescript-jsx-mode
+  ;;   '(progn
+  ;;      (add-hook 'typescript-jsx-mode-hook #'add-node-modules-path)
+  ;;      (add-hook 'typescript-jsx-mode-hook #'prettier-js-mode)))
+  
+  (setq-default evil-kill-on-visual-paste nil)
+  (setq flycheck-idle-change-delay 5)
   ;; https://github.com/syl20bnr/spacemacs/issues/8206#issuecomment-392347981
   ;; (defun rjsx-hybrid-keybindings ()
   ;;   "Bind C-d to `rjsx-delete-creates-full-tag'."
@@ -419,18 +446,18 @@ before packages are loaded."
   ;;     (error "Failed defining RJSX hybrid state keybindings")))
   ;; (add-hook 'rjsx-mode-hook #'rjsx-hybrid-keybindings)
   ;; https://emacs.stackexchange.com/questions/21205/flycheck-with-file-relative-eslint-executable
-  (defun my/use-eslint-from-node-modules ()
-    (let* ((root (locate-dominating-file
-                  (or (buffer-file-name) default-directory)
-                  "node_modules"))
-           (eslint
-            (and root
-                 (expand-file-name "node_modules/.bin/eslint"
-                                   root))))
-      (when (and eslint (file-executable-p eslint))
-        (setq-local flycheck-javascript-eslint-executable eslint))))
+  ;; (defun my/use-eslint-from-node-modules ()
+  ;;   (let* ((root (locate-dominating-file
+  ;;                 (or (buffer-file-name) default-directory)
+  ;;                 "node_modules"))
+  ;;          (eslint
+  ;;           (and root
+  ;;                (expand-file-name "node_modules/.bin/eslint"
+  ;;                                  root))))
+  ;;     (when (and eslint (file-executable-p eslint))
+  ;;       (setq-local flycheck-javascript-eslint-executable eslint))))
 
-  (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
+  ;; (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
   
   ;; https://stackoverflow.com/questions/36719386/spacemacs-set-tab-width
   (defun my-setup-indent (n)
@@ -438,12 +465,15 @@ before packages are loaded."
     ;; (setq c-basic-offset n)
     ;; web development
     ;; (setq javascript-indent-level n) ; javascript-mode
-    ;; (setq js-indent-level n) ; js-mode
-    (setq js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
+    (setq js-indent-level n) ; js-mode
+    ;; (setq js2-basic-offset n) ; js2-mode, in latest js2-mode, it's alias of js-indent-level
     (setq web-mode-markup-indent-offset n) ; web-mode, html tag in html file
     (setq web-mode-css-indent-offset n) ; web-mode, css in html file
     (setq web-mode-code-indent-offset n) ; web-mode, js code in html file
     (setq css-indent-offset n) ; css-mode
+    ;; (setq rjsx-mode-indent-level n) ; typescript
+    (setq typescript-indent-level n) ; typescript)
+    (setq typescript-tsx-indent-level n) ; typescript)
     )
   (my-setup-indent 2) ; indent 2 spaces width
 
@@ -453,6 +483,7 @@ before packages are loaded."
   ;; (require 'elisp-format)
   ;; (add-hook 'typescript-mode-hook 'flycheck-mode)
   ;; (add-hook 'javascript-mode-hook 'flycheck-mode) 
+  (add-hook 'typescript-jsx-mode-hook 'lsp-typescript-jsx-mode-hook)
 
   (defun save-all ()
     (interactive)
@@ -513,7 +544,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (elisp-format vmd-mode mmm-mode markdown-toc markdown-mode gh-md zenburn-theme zen-and-art-theme yasnippet-snippets yaml-mode ws-butler writeroom-mode winum white-sand-theme which-key wgrep web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme treemacs-projectile treemacs-evil toxi-theme toc-org tide tao-theme tangotango-theme tango-plus-theme tango-2-theme symon symbol-overlay sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex seti-theme rjsx-mode reverse-theme reveal-in-osx-finder restart-emacs request rebecca-theme rainbow-mode rainbow-identifiers rainbow-delimiters railscasts-theme purple-haze-theme professional-theme prettier-js popwin planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode pcre2el password-generator paradox overseer osx-trash osx-dictionary osx-clipboard organic-green-theme org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme ob-elixir nodejs-repl noctilux-theme naquadah-theme nameless mustang-theme move-text monokai-theme monochrome-theme molokai-theme moe-theme minimal-theme material-theme majapahit-theme madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode link-hint light-soap-theme launchctl key-chord kaolin-themes json-navigator json-mode js2-refactor js-doc jbeans-theme jazz-theme ivy-yasnippet ivy-xref ivy-purpose ivy-hydra ir-black-theme inkpot-theme indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme google-translate golden-ratio git-gutter-fringe git-gutter-fringe+ gandalf-theme fuzzy font-lock+ flycheck-pos-tip flycheck-package flycheck-mix flycheck-credo flx-ido flatui-theme flatland-theme fill-column-indicator farmhouse-theme fancy-battery eziam-theme eyebrowse expand-region exotica-theme evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme erlang emojify emoji-cheat-sheet-plus elisp-slime-nav editorconfig dumb-jump dracula-theme dotenv-mode doom-themes doom-modeline django-theme diminish diff-hl devdocs darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme counsel-projectile company-tern company-statistics company-emoji column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-identifiers-mode clues-theme clean-aindent-mode chocolate-theme cherry-blossom-theme centered-cursor-mode busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-compile atom-one-dark-theme apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes alchemist aggressive-indent afternoon-theme ace-link ac-ispell))))
+    (nginx-mode pcap-mode csv-mode elisp-format vmd-mode mmm-mode markdown-toc markdown-mode gh-md zenburn-theme zen-and-art-theme yasnippet-snippets yaml-mode ws-butler writeroom-mode winum white-sand-theme which-key wgrep web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme treemacs-projectile treemacs-evil toxi-theme toc-org tide tao-theme tangotango-theme tango-plus-theme tango-2-theme symon symbol-overlay sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex seti-theme rjsx-mode reverse-theme reveal-in-osx-finder restart-emacs request rebecca-theme rainbow-mode rainbow-identifiers rainbow-delimiters railscasts-theme purple-haze-theme professional-theme prettier-js popwin planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode pcre2el password-generator paradox overseer osx-trash osx-dictionary osx-clipboard organic-green-theme org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme ob-elixir nodejs-repl noctilux-theme naquadah-theme nameless mustang-theme move-text monokai-theme monochrome-theme molokai-theme moe-theme minimal-theme material-theme majapahit-theme madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode link-hint light-soap-theme launchctl key-chord kaolin-themes json-navigator json-mode js2-refactor js-doc jbeans-theme jazz-theme ivy-yasnippet ivy-xref ivy-purpose ivy-hydra ir-black-theme inkpot-theme indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme google-translate golden-ratio git-gutter-fringe git-gutter-fringe+ gandalf-theme fuzzy font-lock+ flycheck-pos-tip flycheck-package flycheck-mix flycheck-credo flx-ido flatui-theme flatland-theme fill-column-indicator farmhouse-theme fancy-battery eziam-theme eyebrowse expand-region exotica-theme evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme erlang emojify emoji-cheat-sheet-plus elisp-slime-nav editorconfig dumb-jump dracula-theme dotenv-mode doom-themes doom-modeline django-theme diminish diff-hl devdocs darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme counsel-projectile company-tern company-statistics company-emoji column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-identifiers-mode clues-theme clean-aindent-mode chocolate-theme cherry-blossom-theme centered-cursor-mode busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-compile atom-one-dark-theme apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes alchemist aggressive-indent afternoon-theme ace-link ac-ispell))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
