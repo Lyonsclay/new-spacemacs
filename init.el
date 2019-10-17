@@ -54,7 +54,8 @@ This function should only modify configuration layer settings."
                  javascript-backend 'lsp)
      (typescript :variables
                  node-add-modules-path t
-                 typescript-backend 'lsp)
+                 ;; typescript-backend 'lsp
+                 )
      ;; (typescript :variables
      ;;             typescript-fmt-tool 'typescript-formatter)
      version-control
@@ -427,9 +428,9 @@ before packages are loaded."
   (eval-after-load 'flycheck
     '(flycheck-add-mode 'html-tidy 'web-mode))
 
-  ;; https://github.com/flycheck/flycheck/issues/1472#issuecomment-396058812
-  (eval-after-load 'flycheck
-    '(setcar (memq 'source-inplace (flycheck-checker-get 'typescript-tslint 'command)) 'source-original)) 
+  ;; ;; https://github.com/flycheck/flycheck/issues/1472#issuecomment-396058812
+  ;; (eval-after-load 'flycheck
+  ;;   '(setcar (memq 'source-inplace (flycheck-checker-get 'typescript-tslint 'command)) 'source-original)) 
   ;; (setq node-add-modules-path t)
   ;; (eval-after-load 'typescript-jsx-mode
   ;;   '(progn
@@ -483,7 +484,7 @@ before packages are loaded."
   ;; (require 'elisp-format)
   ;; (add-hook 'typescript-mode-hook 'flycheck-mode)
   ;; (add-hook 'javascript-mode-hook 'flycheck-mode) 
-  (add-hook 'typescript-jsx-mode-hook 'lsp-typescript-jsx-mode-hook)
+  ;; (add-hook 'typescript-tsx-mode-hook 'lsp-typescript-enable)
 
   (defun save-all ()
     (interactive)
