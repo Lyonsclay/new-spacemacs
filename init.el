@@ -49,8 +49,10 @@ This function should only modify configuration layer settings."
      ;; spell-checking
      syntax-checking
      lsp
-     javascript
-     typescript
+     (javascript :variables
+                 node-add-modules-path t)
+     (typescript :variables
+                 node-add-modules-path t)
      version-control
      themes-megapack
      json
@@ -409,7 +411,8 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-  (setq default-frame-alist '((font . "Source Code Pro Medium-14"))) ;; set default font for emacs --daemon / emacsclient
+  (setq default-frame-alist '((font . "Source Code Pro Medium-14")(toggle-scroll-bar -1))) ;; set default font for emacs --daemon / emacsclient
+  
 
   (setq create-lockfiles nil)
 ;; (setq require-final-newline t)
