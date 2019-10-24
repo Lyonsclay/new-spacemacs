@@ -409,9 +409,8 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-  (setq default-frame-alist '((font . "Source Code Pro Medium-14")
-                              (fullscreen . fullboth)
-                              (fullscreen-restore . fullheight))) ;;; set default font for emacs --daemon / emacsclient
+  (setq default-frame-alist '((font . "Source Code Pro Medium-14"))) ;; set default font for emacs --daemon / emacsclient
+
   (setq create-lockfiles nil)
 ;; (setq require-final-newline t)
   )
@@ -429,6 +428,8 @@ configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
 
+  (setq default-frame-alist '((fullscreen . fullboth)
+                              (fullscreen-restore . fullheight))) ;; set default font for emacs --daemon / emacsclient
 
   (eval-after-load 'flycheck
     '(flycheck-add-mode 'html-tidy 'web-mode))
