@@ -346,7 +346,7 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-highlight-delimiters 'all
    ;; If non-nil, start an Emacs server if one is not already running.
    ;; (default nil)
-   dotspacemacs-enable-server nil
+   dotspacemacs-enable-server t
    ;; Set the emacs server socket location.
    ;; If nil, uses whatever the Emacs default is, otherwise a directory path
    ;; like \"~/.emacs.d/server\". It has no effect if
@@ -355,7 +355,7 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-server-socket-dir nil
    ;; If non-nil, advise quit functions to keep server open when quitting.
    ;; (default nil)
-   dotspacemacs-persistent-server t
+   dotspacemacs-persistent-server nil
    ;; List of search tool executable names. Spacemacs uses the first installed
    ;; tool of the list. Supported tools are `rg', `ag', `pt', `ack' and `grep'.
    ;; (default '("rg" "ag" "pt" "ack" "grep"))
@@ -428,7 +428,8 @@ configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
 
-  (setq default-frame-alist '((fullscreen . fullboth)
+  (setq default-frame-alist '((font . "Source Code Pro Medium-14")
+                              (fullscreen . fullboth)
                               (fullscreen-restore . fullheight))) ;; set default font for emacs --daemon / emacsclient
 
   (eval-after-load 'flycheck
