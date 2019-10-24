@@ -33,6 +33,7 @@ This function should only modify configuration layer settings."
      ;; `M-m f e R' (Emacs style) to install them.
      ;; ----------------------------------------------------------------
      nginx
+     docker
      csv
      markdown
      node
@@ -48,16 +49,8 @@ This function should only modify configuration layer settings."
      ;; spell-checking
      syntax-checking
      lsp
-     ;; treemacs
-     (javascript :variables
-                 node-add-modules-path t
-                 javascript-backend 'lsp)
-     (typescript :variables
-                 node-add-modules-path t
-                 ;; typescript-backend 'lsp
-                 )
-     ;; (typescript :variables
-     ;;             typescript-fmt-tool 'typescript-formatter)
+     javascript
+     typescript
      version-control
      themes-megapack
      json
@@ -160,7 +153,7 @@ It should only modify the values of Spacemacs settings."
    ;; directory. A string value must be a path to an image format supported
    ;; by your Emacs build.
    ;; If the value is nil then no banner is displayed. (default 'official)
-   dotspacemacs-startup-banner 'random
+   dotspacemacs-startup-banner 'official
    ;; List of items to show in startup buffer or an association list of
    ;; the form `(list-type . list-size)`. If nil then it is disabled.
    ;; Possible values for list-type are:
@@ -183,8 +176,15 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(doom-one atom-one-dark doom-peacock seti gruvbox-dark-medium dakrone naquadah
-                                       monokai doom-vibrant)
+   dotspacemacs-themes '(doom-one
+                         atom-one-dark
+                         doom-peacock
+                         seti
+                         gruvbox-dark-medium
+                         dakrone
+                         naquadah
+                         monokai
+                         doom-vibrant)
    ;; Set the theme for the Spaceline. Supported themes are `spacemacs',
    ;; `all-the-icons', `custom', `doom', `vim-powerline' and `vanilla'. The
    ;; first three are spaceline themes. `doom' is the doom-emacs mode-line.
@@ -355,7 +355,7 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-server-socket-dir nil
    ;; If non-nil, advise quit functions to keep server open when quitting.
    ;; (default nil)
-   dotspacemacs-persistent-server nil
+   dotspacemacs-persistent-server t
    ;; List of search tool executable names. Spacemacs uses the first installed
    ;; tool of the list. Supported tools are `rg', `ag', `pt', `ack' and `grep'.
    ;; (default '("rg" "ag" "pt" "ack" "grep"))
@@ -409,6 +409,9 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
+  (setq default-frame-alist '((font . "Source Code Pro Medium-14")
+                              (fullscreen . fullboth)
+                              (fullscreen-restore . fullheight))) ;;; set default font for emacs --daemon / emacsclient
   (setq create-lockfiles nil)
 ;; (setq require-final-newline t)
   )
@@ -425,6 +428,8 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
+
+
   (eval-after-load 'flycheck
     '(flycheck-add-mode 'html-tidy 'web-mode))
 
@@ -485,7 +490,9 @@ before packages are loaded."
   ;; (add-hook 'typescript-mode-hook 'flycheck-mode)
   ;; (add-hook 'javascript-mode-hook 'flycheck-mode) 
   ;; (add-hook 'typescript-tsx-mode-hook 'lsp-typescript-enable)
-
+  ;; (setf (lsp-session-folders-blacklist (lsp-session)) nil)
+  ;; (lsp--persist-session (lsp-session))
+  
   (defun save-all ()
     (interactive)
     (save-some-buffers t))
