@@ -74,6 +74,7 @@ This function should only modify configuration layer settings."
    ;; Also include the dependencies as they will not be resolved automatically.
    dotspacemacs-additional-packages '(
                                       ;; eslintd-fix
+                                      flycheck-flow
                                       elisp-format key-chord)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -411,7 +412,7 @@ This function is called immediately after `dotspacemacs/init', before layer
 configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
-  (setq default-frame-alist '((font . "Source Code Pro Medium-14")(toggle-scroll-bar -1))) ;; set default font for emacs --daemon / emacsclient
+  ;; (setq default-frame-alist '((font . "Source Code Pro Medium-14")(toggle-scroll-bar -1))) ;; set default font for emacs --daemon / emacsclient
   
 
   (setq create-lockfiles nil)
@@ -431,12 +432,13 @@ configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
 
-  (setq default-frame-alist '((font . "Source Code Pro Medium-14")
-                              (fullscreen . fullboth)
-                              (fullscreen-restore . fullheight))) ;; set default font for emacs --daemon / emacsclient
-
-  (eval-after-load 'flycheck
-    '(flycheck-add-mode 'html-tidy 'web-mode))
+  ;; (setq default-frame-alist '((font . "Source Code Pro Medium-14")
+  ;;                             (fullscreen . fullboth)
+  ;;                             (fullscreen-restore . fullheight))) ;; set default font for emacs --daemon / emacsclient
+  (require 'flycheck-flow)
+  (add-hook 'javascript-mode-hook 'flycheck-mode)
+  ;; (eval-after-load 'flycheck
+  ;;   '(flycheck-add-mode 'html-tidy 'web-mode))
 
   ;; ;; https://github.com/flycheck/flycheck/issues/1472#issuecomment-396058812
   ;; (eval-after-load 'flycheck
@@ -448,7 +450,7 @@ before packages are loaded."
   ;;      (add-hook 'typescript-jsx-mode-hook #'prettier-js-mode)))
   
   (setq-default evil-kill-on-visual-paste nil)
-  (setq flycheck-idle-change-delay 5)
+  ;; (setq flycheck-idle-change-delay 5)
   ;; https://github.com/syl20bnr/spacemacs/issues/8206#issuecomment-392347981
   ;; (defun rjsx-hybrid-keybindings ()
   ;;   "Bind C-d to `rjsx-delete-creates-full-tag'."
@@ -555,6 +557,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(evil-want-Y-yank-to-eol nil)
  '(package-selected-packages
    (quote
     (nginx-mode pcap-mode csv-mode elisp-format vmd-mode mmm-mode markdown-toc markdown-mode gh-md zenburn-theme zen-and-art-theme yasnippet-snippets yaml-mode ws-butler writeroom-mode winum white-sand-theme which-key wgrep web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme treemacs-projectile treemacs-evil toxi-theme toc-org tide tao-theme tangotango-theme tango-plus-theme tango-2-theme symon symbol-overlay sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex seti-theme rjsx-mode reverse-theme reveal-in-osx-finder restart-emacs request rebecca-theme rainbow-mode rainbow-identifiers rainbow-delimiters railscasts-theme purple-haze-theme professional-theme prettier-js popwin planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode pcre2el password-generator paradox overseer osx-trash osx-dictionary osx-clipboard organic-green-theme org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme ob-elixir nodejs-repl noctilux-theme naquadah-theme nameless mustang-theme move-text monokai-theme monochrome-theme molokai-theme moe-theme minimal-theme material-theme majapahit-theme madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode link-hint light-soap-theme launchctl key-chord kaolin-themes json-navigator json-mode js2-refactor js-doc jbeans-theme jazz-theme ivy-yasnippet ivy-xref ivy-purpose ivy-hydra ir-black-theme inkpot-theme indent-guide hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme google-translate golden-ratio git-gutter-fringe git-gutter-fringe+ gandalf-theme fuzzy font-lock+ flycheck-pos-tip flycheck-package flycheck-mix flycheck-credo flx-ido flatui-theme flatland-theme fill-column-indicator farmhouse-theme fancy-battery eziam-theme eyebrowse expand-region exotica-theme evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme erlang emojify emoji-cheat-sheet-plus elisp-slime-nav editorconfig dumb-jump dracula-theme dotenv-mode doom-themes doom-modeline django-theme diminish diff-hl devdocs darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme counsel-projectile company-tern company-statistics company-emoji column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-identifiers-mode clues-theme clean-aindent-mode chocolate-theme cherry-blossom-theme centered-cursor-mode busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-compile atom-one-dark-theme apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes alchemist aggressive-indent afternoon-theme ace-link ac-ispell))))
@@ -563,5 +566,6 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(default ((t (:background nil))))
+ '(scroll-bar ((t (:background "black" :foreground "black" :slant italic :width normal)))))
 )
