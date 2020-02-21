@@ -87,7 +87,7 @@ This function should only modify configuration layer settings."
    ;; '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
    dotspacemacs-additional-packages '(
-                                      ;; eslintd-fix
+                                      eslintd-fix
                                       minimap
                                       flycheck-flow
                                       elisp-format key-chord)
@@ -505,8 +505,8 @@ before packages are loaded."
   (add-hook 'focus-out-hook 'garbage-collect)
   ;; (setq flycheck-check-syntax-automatically '(save)
   ;;       flycheck-idle-change-delay 5.0)	    
+  (setq flycheck-check-syntax-automatically '(save idle-change mode-enable))
   (setq flycheck-idle-change-delay 5.0)
-  ;; (setq flycheck--idle-trigger-timer 5.0)
   (setq flycheck-idle-buffer-switch-delay 5.0)
   (require 'minimap)
   (setq minimap-window-location 'right)
