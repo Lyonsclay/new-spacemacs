@@ -2,7 +2,7 @@
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
 
-(defun dotspacemacs/layers () 
+(defun dotspacemacs/layers ()
   "Layer configuration:
 This function should only modify configuration layer settings."
   (setq-default
@@ -38,15 +38,18 @@ This function should only modify configuration layer settings."
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
      ;; `M-m f e R' (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     ;; (go :variables go-format-before-save t)
-     go
+     (go :variables
+         godoc-at-point-function 'godoc-gogetdoc
+         ;; go-format-before-save t
+         )
+
      ;; nginx
      ;; docker
      ;; csv
      ;; markdown
      node
      auto-completion
-     ;; better-defaults 
+     ;; better-defaults
      emacs-lisp
      git
      ivy
@@ -56,7 +59,7 @@ This function should only modify configuration layer settings."
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
      ;; spell-checking
-     shell-scripts 
+     shell-scripts
      syntax-checking
      (lsp :variables
           lsp-navigation 'simple
@@ -291,7 +294,7 @@ It should only modify the values of Spacemacs settings."
 
    ;; If non-nil then the last auto saved layouts are resumed automatically upon
    ;; start. (default nil)
-   dotspacemacs-auto-resume-layouts nil
+   dotspacemacs-auto-resume-layouts t
 
    ;; If non-nil, auto-generate layout name when creating new layouts. Only has
    ;; effect when using the "jump to layout by number" commands. (default nil)
@@ -314,7 +317,7 @@ It should only modify the values of Spacemacs settings."
    ;; If non-nil, the paste transient-state is enabled. While enabled, after you
    ;; paste something, pressing `C-j' and `C-k' several times cycles through the
    ;; elements in the `kill-ring'. (default nil)
-   dotspacemacs-enable-paste-transient-state nil
+   dotspacemacs-enable-paste-transient-state t
 
    ;; Which-key delay in seconds. The which-key buffer is the popup listing
    ;; the commands bound to the current keystroke sequence. (default 0.4)
@@ -413,7 +416,7 @@ It should only modify the values of Spacemacs settings."
    ;; If non-nil pressing the closing parenthesis `)' key in insert mode passes
    ;; over any automatically added closing parenthesis, bracket, quote, etc...
    ;; This can be temporary disabled by pressing `C-q' before `)'. (default nil)
-   dotspacemacs-smart-closing-parenthesis nil
+   dotspacemacs-smart-closing-parenthesis t
 
    ;; Select a scope to highlight delimiters. Possible values are `any',
    ;; `current', `all' or `nil'. Default is `all' (highlight any scope and
@@ -422,7 +425,7 @@ It should only modify the values of Spacemacs settings."
 
    ;; If non-nil, start an Emacs server if one is not already running.
    ;; (default nil)
-   dotspacemacs-enable-server nil
+   dotspacemacs-enable-server t
 
    ;; Set the emacs server socket location.
    ;; If nil, uses whatever the Emacs default is, otherwise a directory path
@@ -468,7 +471,7 @@ It should only modify the values of Spacemacs settings."
    ;; `trailing' to delete only the whitespace at end of lines, `changed' to
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
-   dotspacemacs-whitespace-cleanup 'trailing
+   dotspacemacs-whitespace-cleanup 'all
 
    ;; If non nil activate `clean-aindent-mode' which tries to correct
    ;; virtual indentation of simple modes. This can interfer with mode specific
@@ -501,10 +504,6 @@ configuration.
 It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
   ;; (setq default-frame-alist '((font . "Source Code Pro Medium-14")(toggle-scroll-bar -1))) ;; set default font for emacs --daemon / emacsclient
-  
-
-  (setq create-lockfiles nil)
-;; (setq require-final-newline t)
   )
 
 (defun dotspacemacs/user-load ()
@@ -529,7 +528,7 @@ before packages are loaded."
   (add-hook 'focus-out-hook 'garbage-collect)
 
   (setq flycheck-check-syntax-automatically '(save))
-  (setq flycheck-idle-change-delay 5.0)	
+  (setq flycheck-idle-change-delay 3.0)
   (setq flycheck-check-syntax-automatically '(save idle-change mode-enable))
   (setq flycheck-idle-buffer-switch-delay 5.0)
 
@@ -549,13 +548,13 @@ before packages are loaded."
 
   ;; ;; https://github.com/flycheck/flycheck/issues/1472#issuecomment-396058812
   ;; (eval-after-load 'flycheck
-  ;;   '(setcar (memq 'source-inplace (flycheck-checker-get 'typescript-tslint 'command)) 'source-original)) 
+  ;;   '(setcar (memq 'source-inplace (flycheck-checker-get 'typescript-tslint 'command)) 'source-original))
   ;; (setq node-add-modules-path t)
   ;; (eval-after-load 'typescript-jsx-mode
   ;;   '(progn
   ;;      (add-hook 'typescript-jsx-mode-hook #'add-node-modules-path)
   ;;      (add-hook 'typescript-jsx-mode-hook #'prettier-js-mode)))
-  
+
   (setq-default evil-kill-on-visual-paste nil)
   ;; (setq flycheck-idle-change-delay 5)
   ;; https://github.com/syl20bnr/spacemacs/issues/8206#issuecomment-392347981
@@ -578,7 +577,7 @@ before packages are loaded."
   ;;       (setq-local flycheck-javascript-eslint-executable eslint))))
 
   ;; (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
-  
+
   ;; https://stackoverflow.com/questions/36719386/spacemacs-set-tab-width
   (defun my-setup-indent (n)
     ;; java/c/c++
@@ -602,7 +601,7 @@ before packages are loaded."
 
   ;; (require 'elisp-format)
   ;; (add-hook 'typescript-mode-hook 'flycheck-mode)
-  ;; (add-hook 'javascript-mode-hook 'flycheck-mode) 
+  ;; (add-hook 'javascript-mode-hook 'flycheck-mode)
   ;; (add-hook 'typescript-tsx-mode-hook 'lsp-typescript-enable)
 
   (defun save-all ()
@@ -679,3 +678,17 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(default ((t (:background nil)))))
 )
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (zenburn-theme zen-and-art-theme yaml-mode ws-butler winum white-sand-theme which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme toxi-theme toc-org tide typescript-mode tern tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit sunny-day-theme sublime-themes subatomic256-theme subatomic-theme spaceline powerline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode seti-theme scss-mode sass-mode reverse-theme reveal-in-osx-finder restart-emacs request rebecca-theme rainbow-mode rainbow-identifiers rainbow-delimiters railscasts-theme purple-haze-theme pug-mode professional-theme popwin planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode pcre2el pbcopy paradox spinner osx-trash osx-dictionary orgit organic-green-theme org-plus-contrib org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noctilux-theme neotree naquadah-theme mustang-theme move-text monokai-theme monochrome-theme molokai-theme moe-theme minimal-theme material-theme majapahit-theme magit-gitflow magit-popup madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode skewer-mode simple-httpd linum-relative link-hint light-soap-theme launchctl key-chord json-mode json-snatcher json-reformat js2-refactor multiple-cursors js-doc jbeans-theme jazz-theme ivy-hydra ir-black-theme insert-shebang inkpot-theme indent-guide hydra lv hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation heroku-theme hemisu-theme helm-make hc-zenburn-theme haml-mode gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme google-translate golden-ratio go-guru go-eldoc gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gandalf-theme fuzzy flycheck-pos-tip pos-tip flycheck flx-ido flx flow-js2-mode js2-mode flow-minor-mode flatui-theme flatland-theme fish-mode fill-column-indicator farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit magit git-commit with-editor transient evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu espresso-theme eslintd-fix emoji-cheat-sheet-plus helm helm-core emmet-mode elisp-slime-nav elisp-format dumb-jump f s dracula-theme django-theme diminish diff-hl darktooth-theme autothemer darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme counsel-projectile projectile pkg-info epl counsel swiper ivy company-web web-completion-data company-statistics company-shell company-go go-mode company-emoji company column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-identifiers-mode dash coffee-mode clues-theme clean-aindent-mode cherry-blossom-theme busybee-theme bubbleberry-theme birds-of-paradise-plus-theme bind-map bind-key badwolf-theme auto-yasnippet yasnippet auto-highlight-symbol auto-compile packed async apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme adaptive-wrap ace-window ace-link avy ac-ispell auto-complete popup doom-city-lights-theme))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
