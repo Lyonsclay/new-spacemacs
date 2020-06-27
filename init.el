@@ -63,17 +63,23 @@ This function should only modify configuration layer settings."
      ;; spell-checking
      shell-scripts
      syntax-checking
+     ;; lsp-ui
+     ;; lsp-treemacs
      (lsp :variables
           lsp-navigation 'simple
-          lsp-ui-doc-enable nil
+          ;; lsp-ui-doc-enable nil
           lsp-clients-go-gocode-completion-enabled nil
           lsp-clients-go-server 'gopls)
-     (javascript :variables javascript-backend 'lsp
+     (javascript :variables
+                 javascript-backend 'lsp
                  js2-mode-show-strict-warnings nil
                  js2-mode-show-parse-errors nil
                  node-add-modules-path t)
      (typescript :variables
+                 typescript-backend 'tide
                  node-add-modules-path t)
+     (treemacs :variables
+               treemacs-lock-width t)
      version-control
      themes-megapack
      json
@@ -98,7 +104,7 @@ This function should only modify configuration layer settings."
                                       ;; minimap
                                       ;; flycheck-flow
                                       flow-js2-mode
-                                      elisp-format
+                                      ;; elisp-format
                                       key-chord)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
