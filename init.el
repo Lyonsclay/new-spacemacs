@@ -40,7 +40,8 @@ This function should only modify configuration layer settings."
      ;; ----------------------------------------------------------------
      (go :variables
          godoc-at-point-function 'godoc-gogetdoc
-         ;; go-format-before-save t
+         go-use-golangci-lint t
+         go-format-before-save t
          )
      (reasonml :variables
                reason-auto-refmt t)
@@ -67,9 +68,10 @@ This function should only modify configuration layer settings."
      ;; lsp-treemacs
      (lsp :variables
           lsp-navigation 'simple
-          ;; lsp-ui-doc-enable nil
+          lsp-ui-doc-enable nil
           lsp-clients-go-gocode-completion-enabled nil
-          lsp-clients-go-server 'gopls)
+          lsp-clients-go-server 'gopls
+          )
      (javascript :variables
                  javascript-backend 'lsp
                  js2-mode-show-strict-warnings nil
