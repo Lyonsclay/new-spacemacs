@@ -75,8 +75,8 @@ This function should only modify configuration layer settings."
      ;; lsp-treemacs
      (lsp :variables
           lsp-navigation 'simple
-          lsp-ui-doc-enable nil
-          lsp-clients-go-gocode-completion-enabled nil
+          ;; lsp-ui-doc-enable nil
+          ;; lsp-clients-go-gocode-completion-enabled nil
           lsp-clients-go-server 'gopls
           )
      (javascript :variables
@@ -553,7 +553,7 @@ before packages are loaded."
 
   (setq flycheck-idle-change-delay 2.0)
   (setq flycheck-check-syntax-automatically '(save idle-change mode-enable))
-  (setq flycheck-idle-buffer-switch-delay 5.0)
+  (setq flycheck-idle-buffer-switch-delay 2.0)
 
   ;; (require 'minimap)
   ;; (setq minimap-window-location 'right)
@@ -587,19 +587,6 @@ before packages are loaded."
   ;;       (define-key evil-hybrid-state-map (kbd "C-d") #'rjsx-delete-creates-full-tag)
   ;;     (error "Failed defining RJSX hybrid state keybindings")))
   ;; (add-hook 'rjsx-mode-hook #'rjsx-hybrid-keybindings)
-  ;; https://emacs.stackexchange.com/questions/21205/flycheck-with-file-relative-eslint-executable
-  ;; (defun my/use-eslint-from-node-modules ()
-  ;;   (let* ((root (locate-dominating-file
-  ;;                 (or (buffer-file-name) default-directory)
-  ;;                 "node_modules"))
-  ;;          (eslint
-  ;;           (and root
-  ;;                (expand-file-name "node_modules/.bin/eslint"
-  ;;                                  root))))
-  ;;     (when (and eslint (file-executable-p eslint))
-  ;;       (setq-local flycheck-javascript-eslint-executable eslint))))
-
-  ;; (add-hook 'flycheck-mode-hook #'my/use-eslint-from-node-modules)
 
   ;; https://stackoverflow.com/questions/36719386/spacemacs-set-tab-width
   (defun my-setup-indent (n)
@@ -679,3 +666,40 @@ before packages are loaded."
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(evil-want-Y-yank-to-eol nil)
+ '(hl-todo-keyword-faces
+   '(("TODO" . "#dc752f")
+     ("NEXT" . "#dc752f")
+     ("THEM" . "#2d9574")
+     ("PROG" . "#4f97d7")
+     ("OKAY" . "#4f97d7")
+     ("DONT" . "#f2241f")
+     ("FAIL" . "#f2241f")
+     ("DONE" . "#86dc2f")
+     ("NOTE" . "#b1951d")
+     ("KLUDGE" . "#b1951d")
+     ("HACK" . "#b1951d")
+     ("TEMP" . "#b1951d")
+     ("FIXME" . "#dc752f")
+     ("XXX+" . "#dc752f")
+     ("\\?\\?\\?+" . "#dc752f")))
+ '(lsp-python-ms-extra-paths ["./source"])
+ '(package-selected-packages
+   '(yapfify stickyfunc-enhance pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements lsp-python-ms live-py-mode importmagic epc ctable concurrent deferred helm-pydoc helm-gtags helm-cscope xcscope ggtags dap-mode bui cython-mode counsel-gtags company-anaconda blacken anaconda-mode pythonic zenburn-theme zen-and-art-theme yasnippet-snippets yaml-mode ws-butler writeroom-mode winum white-sand-theme which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen utop use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme tuareg treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil toxi-theme toc-org tide tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit symon symbol-overlay sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode seti-theme scss-mode sass-mode rjsx-mode reverse-theme reveal-in-osx-finder restart-emacs request rebecca-theme reason-mode rainbow-mode rainbow-identifiers rainbow-delimiters railscasts-theme purple-haze-theme pug-mode professional-theme prettier-js popwin planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme pcre2el password-generator paradox overseer osx-trash osx-dictionary osx-clipboard organic-green-theme org-superstar open-junk-file omtose-phellack-theme oldlace-theme ocp-indent occidental-theme obsidian-theme nodejs-repl noctilux-theme naquadah-theme nameless mustang-theme move-text monokai-theme monochrome-theme molokai-theme moe-theme modus-vivendi-theme modus-operandi-theme minimal-theme material-theme majapahit-theme magit-svn magit-section magit-gitflow madhat2r-theme macrostep lush-theme lsp-ui lsp-treemacs lsp-ivy lorem-ipsum livid-mode link-hint light-soap-theme launchctl key-chord kaolin-themes json-navigator json-mode js2-refactor js-doc jbeans-theme jazz-theme ivy-yasnippet ivy-xref ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme indent-guide impatient-mode hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme google-translate golden-ratio godoctor go-tag go-rename go-impl go-guru go-gen-test go-fill-struct go-eldoc gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ gandalf-theme fuzzy font-lock+ flycheck-pos-tip flycheck-package flycheck-ocaml flycheck-golangci-lint flycheck-elsa flycheck-bashate flx-ido flow-js2-mode flatui-theme flatland-theme fish-mode farmhouse-theme fancy-battery eziam-theme eyebrowse expand-region exotica-theme evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eslintd-fix emr emojify emoji-cheat-sheet-plus emmet-mode elisp-slime-nav editorconfig dune dumb-jump dracula-theme dotenv-mode doom-themes django-theme diminish devdocs darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme counsel-projectile counsel-css company-web company-shell company-go company-emoji column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-identifiers-mode clues-theme chocolate-theme cherry-blossom-theme centered-cursor-mode busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-compile atom-one-dark-theme apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme add-node-modules-path ace-link ac-ispell)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+)
