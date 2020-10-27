@@ -12,24 +12,6 @@ This is my personal spacemacs config but I am interested in optimizing the confi
 ### Themes
 In emacs themse set the colors and styling of the text and layout. I have include the megapack layer which has a boat load of themes to choose from.
 
-#### Start with just a few themes that apply to everything.
-* display ::
-  * theme -
-  * filepath -
-  * major mode -
-  * git snapshot -
-  * error reporting
-* must look consistent across all windows -> possible exception with shell
-* file tree icons and highlighting need to be improved
-* flycheck window highlighting current line error needs to be controlled for best legibility
-* shell needs to have same background color as text editor
-* git diff needs to look sweet like vs code
-* should have easy controls that are clearly described
-* next and previous
-* select old/new branch or commit should have buttons with (key stroke) labels
-* should be way to revert
-* label branches/commits clearly
-
 #### Upgrade process
  Another difficulty of spacemacs is the upgrade process. You have to manually go through a diff file when you pull from the spacemacs repo. Is that a big deal? If you update frequently it can be a challenge to try and interpret your intential changes to the config file versus default settings. While I could be more active with this process I think it is a significant barrier to entry when compared with vs code.
 * the challenge is incorporating user defined configs with an evolving code base
@@ -40,8 +22,8 @@ In emacs themse set the colors and styling of the text and layout. I have includ
 
 #### Getting setup
 * make a git repo for your init.el or entire .spacemacs.d directory
-* add a .gitignore file with `.env` as the first line
-* spacemacs creates a `.env` file that is aggregated from various config files on your local machine that may potentially have secrets.
+* add a .gitignore file with `.spacemacs.env` as the first line
+* spacemacs creates a `.spacemacs.env` file that is aggregated from various config files on your local machine that may potentially have secrets.
 * everytime you make a change to your init.el file or any imported code make a git commit with a clear message
 
 
@@ -71,16 +53,7 @@ In emacs themse set the colors and styling of the text and layout. I have includ
 * Change global font
   * SPC SPC menu-set-font -- will open system fonts selector
 
-### Optimizing
-
-
-### Golang Layer
-* Installing golangci-lint
-  * export GO111MODULE=on
-  * go get github.com/golangci/golangci-lint/cmd/golangci-lint@v1.30.0
-  * go build
-  * M-x find-library - to go to source code for a mode
-
 ### Shell Layer
 * Install vterm; it's a must have if you want to have real(meaning fast) experience.
 * On osx Catalina you will need to enable Full Disk Access for ability to see user folders -- https://emacs.stackexchange.com/a/53037
+* I use hybrid mode which enables the normal C-p/C-n previous next entry navigation and C-r for command look up.
