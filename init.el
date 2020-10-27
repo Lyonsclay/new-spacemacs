@@ -32,14 +32,16 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(markdown
+   '(
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
      ;; `M-m f e R' (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-
-     lsp
+     terraform
+     csv
+     spell-checking
+     reasonml
      (python :variables
       python-formatter 'black
       python-format-on-save nil
@@ -47,35 +49,42 @@ This function should only modify configuration layer settings."
       python-lsp-server 'mspyls
       )
 
+     sphinx
+     (markdown :variables markdown-live-preview-engine 'vmd)
+     (lsp :variables
+      ;; lsp-navigation 'simple
+      ;; lsp-ui-doc-enable nil
+      ;; lsp-clients-go-gocode-completion-enabled nil
+      lsp-clients-go-server 'gopls
+      )
+
      (go :variables
+         go-backend 'lsp
          godoc-at-point-function 'godoc-gogetdoc
          go-use-golangci-lint t
-         ;; go-format-before-save t
+         go-format-before-save t
          )
-     (reasonml :variables
-               reason-auto-refmt t)
+     ;; (reasonml :variables
+     ;;           reason-auto-refmt t)
 
      multiple-cursors
      node
-     auto-completion
      ;; better-defaults
      emacs-lisp
      git
      ivy
-     helm
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
+     ;; helm
+     (shell :variables
+            shell-default-shell 'vterm
+            ;; shell-default-width 30
+            ;; shell-default-position 'right
+            )
      shell-scripts
      syntax-checking
+     auto-completion
      ;; lsp-ui
      ;; lsp-treemacs
-     (lsp :variables
-          lsp-navigation 'simple
-          lsp-ui-doc-enable nil
-          lsp-clients-go-gocode-completion-enabled nil
-          lsp-clients-go-server 'gopls
-          )
+
      (javascript :variables
                  ;; javascript-backend 'lsp
                  js2-mode-show-strict-warnings nil
@@ -86,7 +95,7 @@ This function should only modify configuration layer settings."
                  node-add-modules-path t)
      (treemacs :variables
                treemacs-lock-width t)
-     (org :variables org-enable-github-support t)
+     ;; (org :variables org-enable-github-support t)
      version-control
      themes-megapack
      json
@@ -237,7 +246,7 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-new-empty-buffer-major-mode 'text-mode
 
    ;; Default major mode of the scratch buffer (default `text-mode')
-   dotspacemacs-scratch-mode 'text-mode
+   dotspacemacs-scratch-mode 'emacs-lisp-mode
 
    ;; Initial message in the scratch buffer, such as "Welcome to Spacemacs!"
    ;; (default nil)
@@ -367,7 +376,7 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-fullscreen-at-startup nil
 
    ;; If non-nil `spacemacs/toggle-fullscreen' will not use native fullscreen.
-   ;; Use to disable fullscreen animations in OSX. (default nil)
+   ;; Use to disable fullscreen animations in OSX. ((default nil))
    dotspacemacs-fullscreen-use-non-native t
 
    ;; If non-nil the frame is maximized when Emacs starts up.
@@ -499,7 +508,7 @@ It should only modify the values of Spacemacs settings."
    ;; indent handling like has been reported for `go-mode'.
    ;; If it does deactivate it here.
    ;; (default t)
-   dotspacemacs-use-clean-aindent-mode t
+   dotspacemacs-use-clean-aindent-mode nil
 
    ;; Either nil or a number of seconds. If non-nil zone out after the specified
    ;; number of seconds. (default nil)
@@ -539,29 +548,93 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
-  (eval-after-load "org"
-    '(require 'ox-gfm nil t))
 
-  (evil-leader/set-key "/" 'spacemacs/helm-project-do-ag)
+  (use-package vterm
+    :ensure t)
 
-  (add-hook 'find-file-hook 'linum-mode)
+  (require 'lsp-go)
+  ;; http://blog.binchen.org/posts/how-to-speed-up-lsp-mode.html
+  (with-eval-after-load 'lsp-mode
+    ;; enable log only for debug
+    (setq lsp-log-io nil)
+
+    ;; use `evil-matchit' instead
+    (setq lsp-enable-folding nil)
+
+    ;; no real time syntax check
+    (setq lsp-diagnostic-package :none)
+
+    ;; handle yasnippet by myself
+    (setq lsp-enable-snippet nil)
+
+    ;; use `company-ctags' only.
+    ;; Please note `company-lsp' is automatically enabled if installed
+    ;; (setq lsp-enable-completion-at-point nil)
+
+    ;; turn off for better performance
+    (setq lsp-enable-symbol-highlighting nil)
+
+    ;; use ffip instead
+    (setq lsp-enable-links nil)
+
+    ;; auto restart lsp
+    (setq lsp-restart 'auto-restart)
+
+    ;; @see https://github.com/emacs-lsp/lsp-mode/pull/1498 and code related to auto configure.
+    ;; Require clients could be slow.
+    ;; I only load `lsp-clients' because it includes the js client which I'm interested
+    (setq lsp-client-packages '(lsp-clients))
+
+    ;; don't scan 3rd party javascript libraries
+    ;; (push "[/\\\\][^/\\\\]*\\.\\(json\\|html\\|jade\\)$" lsp-file-watch-ignored) ; json
+
+    ;; don't ping LSP lanaguage server too frequently
+    (defvar lsp-on-touch-time 0)
+    ;; (defadvice lsp-on-change (around lsp-on-change-hack activate)
+    ;;   ;; don't run `lsp-on-change' too frequently
+    ;;   (when (> (- (float-time (current-time))
+    ;;               lsp-on-touch-time) 30) ;; 30 seconds
+    ;;     (setq lsp-on-touch-time (float-time (current-time)))
+    ;;     ad-do-it))
+    )
+
+  ;; (defun my-connect-lsp (&optional no-reconnect)
+  ;;   "Connect lsp server.  If NO-RECONNECT is t, don't shutdown existing lsp connection."
+  ;;   (interactive "P")
+  ;;   (when (and (not no-reconnect)
+  ;;              (fboundp 'lsp-disconnect))
+  ;;     (lsp-disconnect))
+  ;;   (when (and buffer-file-name
+  ;;              (not (member (file-name-extension buffer-file-name)
+  ;;                           '("json"))))
+  ;;     (unless (and (boundp 'lsp-mode) lsp-mode)
+  ;;       (if (derived-mode-p 'js2-mode) (setq-local lsp-enable-imenu nil))
+  ;;       (lsp-deferred))))
+  (fset 'setup-ml-tools
+    (kmacro-lambda-form [?  ?T ?F ?  ?f ?t return ?\C-n ?\C-n ?\C-n ?\C-n return ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n return ?\C-n ?\C-n ?\C-n return ?\C-n ?\C-n ?\C-n ?\C-n return ?  ?p ?\' ?j ?k ?j ?k ?j ?k ?f ?d ?  ?w ?L ?  ?g ?s ?  ?1 ?  ?m ?v ?p ?a ?  ?g ?s ?  ?1] 0 "%d"))
+
+  ;; (eval-after-load "org"
+  ;;   '(require 'ox-gfm nil t))
+
+  ;; (add-hook 'find-file-hook 'linum-mode)
   ;; This prevents the inferior python shell from outputing weird byte strings.
-  ;;
+  ;; [TODO] or does it?
   (with-eval-after-load 'python
     (add-to-list 'python-shell-completion-native-disabled-interpreters "python"))
 
-
   (setq create-lockfiles nil)
+
+  ;; [TODO] not sure if this is working.
   (setq require-final-newline t)
 
   ;; (add-hook 'javascript-mode-hook 'eslintd-fix-mode)
   ;; (eslintd-fix :toggle javascript-eslint-fix-on-save)
 
-  (add-hook 'focus-out-hook 'garbage-collect)
+  ;; (add-hook 'focus-out-hook 'garbage-collect)
 
-  (setq flycheck-idle-change-delay 2.0)
-  (setq flycheck-check-syntax-automatically '(save idle-change mode-enable))
-  (setq flycheck-idle-buffer-switch-delay 2.0)
+  ;; (setq flycheck-idle-change-delay 4.0)
+  (setq flycheck-check-syntax-automatically '(mode-enable save))
+  ;; (setq flycheck-idle-buffer-switch-delay 4.0)
 
   ;; (require 'minimap)
   ;; (setq minimap-window-location 'right)
@@ -577,6 +650,7 @@ before packages are loaded."
   ;; (eval-after-load 'flycheck
   ;;   '(flycheck-add-mode 'html-tidy 'web-mode))
 
+  ;; TODO verify current situation.
   ;; ;; https://github.com/flycheck/flycheck/issues/1472#issuecomment-396058812
   ;; (eval-after-load 'flycheck
   ;;   '(setcar (memq 'source-inplace (flycheck-checker-get 'typescript-tslint 'command)) 'source-original))
@@ -586,8 +660,12 @@ before packages are loaded."
   ;;      (add-hook 'typescript-jsx-mode-hook #'add-node-modules-path)
   ;;      (add-hook 'typescript-jsx-mode-hook #'prettier-js-mode)))
 
+  ;; If you want to paste the same value in kill ring multiple times you have to prevent the
+  ;; behavior kill-on-visual-paste which will add the deleted word to the kill ring.
   (setq-default evil-kill-on-visual-paste nil)
-  ;; (setq flycheck-idle-change-delay 5)
+
+
+  ;; TODO verify current behavior
   ;; https://github.com/syl20bnr/spacemacs/issues/8206#issuecomment-392347981
   ;; (defun rjsx-hybrid-keybindings ()
   ;;   "Bind C-d to `rjsx-delete-creates-full-tag'."
@@ -596,6 +674,7 @@ before packages are loaded."
   ;;     (error "Failed defining RJSX hybrid state keybindings")))
   ;; (add-hook 'rjsx-mode-hook #'rjsx-hybrid-keybindings)
 
+  ;; TODO is this still needed; could be creating conflicts.
   ;; https://stackoverflow.com/questions/36719386/spacemacs-set-tab-width
   (defun my-setup-indent (n)
     ;; java/c/c++
@@ -632,6 +711,12 @@ before packages are loaded."
 
   (define-key evil-normal-state-map (kbd "SPC o") 'flycheck-mode)
 
+  (defun go-to-dashboard ()
+    (interactive)
+    (find-file "~/clm-dashboard.org"))
+
+  (define-key evil-normal-state-map (kbd "SPC b c") 'go-to-dashboard)
+
   (require 'key-chord)
   (key-chord-mode t)
   (key-chord-define-global "jk" 'evil-normal-state)
@@ -660,6 +745,7 @@ before packages are loaded."
   (global-set-key (kbd "M-\"") 'insert-pair)
   (global-set-key (kbd "M-'") 'insert-pair)
   (global-set-key (kbd "M-(") 'insert-pair)
+  ;; TODO doesn't work result has single quote at end like `word'
   (global-set-key (kbd "M-`") 'insert-pair)
   (global-set-key (kbd "M-<") 'insert-pair)
   (global-set-key (kbd "M-)") 'delete-pair)
@@ -686,8 +772,13 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(ansi-color-faces-vector
    [default bold shadow italic underline bold bold-italic bold])
+ '(counsel-rg-base-command
+   '("rg" "--vimgrep" "--with-filename" "--no-heading" "--line-number" "--smart-case" "%s"))
+ '(evil-escape-excluded-major-modes '(treemacs-mode))
+ '(evil-undo-system nil)
  '(evil-want-Y-yank-to-eol nil)
- '(helm-ag-base-command "rg -uu --vimgrep --no-heading --smart-case")
+ '(gofmt-show-errors 'echo)
+ '(helm-ag-base-command "rg --vimgrep --no-heading --smart-case")
  '(helm-completion-style 'emacs)
  '(hl-todo-keyword-faces
    '(("TODO" . "#dc752f")
@@ -708,7 +799,7 @@ This function is called at the very end of Spacemacs initialization."
  '(linum-format " %3i ")
  '(lsp-python-ms-extra-paths ["./source" "./src" "./" "../"])
  '(package-selected-packages
-   '(tern evil-mc vmd-mode mmm-mode markdown-toc markdown-mode gh-md ox-gfm yapfify stickyfunc-enhance pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements lsp-python-ms live-py-mode ctable concurrent deferred helm-pydoc helm-gtags helm-cscope xcscope ggtags dap-mode bui cython-mode counsel-gtags company-anaconda blacken anaconda-mode pythonic zenburn-theme zen-and-art-theme yasnippet-snippets yaml-mode ws-butler writeroom-mode winum white-sand-theme which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen utop use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme tuareg treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil toxi-theme toc-org tide tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit symon symbol-overlay sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode seti-theme scss-mode sass-mode rjsx-mode reverse-theme reveal-in-osx-finder restart-emacs request rebecca-theme reason-mode rainbow-mode rainbow-identifiers rainbow-delimiters railscasts-theme purple-haze-theme pug-mode professional-theme prettier-js popwin planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme pcre2el password-generator paradox overseer osx-trash osx-dictionary osx-clipboard organic-green-theme org-superstar open-junk-file omtose-phellack-theme oldlace-theme ocp-indent occidental-theme obsidian-theme nodejs-repl noctilux-theme naquadah-theme nameless mustang-theme move-text monokai-theme monochrome-theme molokai-theme moe-theme modus-vivendi-theme modus-operandi-theme minimal-theme material-theme majapahit-theme magit-svn magit-section magit-gitflow madhat2r-theme macrostep lush-theme lsp-ui lsp-treemacs lsp-ivy lorem-ipsum livid-mode link-hint light-soap-theme launchctl key-chord kaolin-themes json-navigator json-mode js2-refactor js-doc jbeans-theme jazz-theme ivy-yasnippet ivy-xref ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme indent-guide impatient-mode hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme google-translate golden-ratio godoctor go-tag go-rename go-impl go-guru go-gen-test go-fill-struct go-eldoc gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ gandalf-theme fuzzy font-lock+ flycheck-pos-tip flycheck-package flycheck-ocaml flycheck-golangci-lint flycheck-elsa flycheck-bashate flx-ido flow-js2-mode flatui-theme flatland-theme fish-mode farmhouse-theme fancy-battery eziam-theme eyebrowse expand-region exotica-theme evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eslintd-fix emr emojify emoji-cheat-sheet-plus emmet-mode elisp-slime-nav editorconfig dune dumb-jump dracula-theme dotenv-mode doom-themes django-theme diminish devdocs darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme counsel-projectile counsel-css company-web company-shell company-go company-emoji column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-identifiers-mode clues-theme chocolate-theme cherry-blossom-theme centered-cursor-mode busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-compile atom-one-dark-theme apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme add-node-modules-path ace-link ac-ispell))
+   '(toml-mode ron-mode racer flycheck-rust cargo rust-mode csv-mode tern evil-mc vmd-mode mmm-mode markdown-toc markdown-mode gh-md ox-gfm yapfify stickyfunc-enhance pytest pyenv-mode py-isort pippel pipenv pyvenv pip-requirements lsp-python-ms live-py-mode ctable concurrent deferred helm-pydoc helm-gtags helm-cscope xcscope ggtags dap-mode bui cython-mode counsel-gtags company-anaconda blacken anaconda-mode pythonic zenburn-theme zen-and-art-theme yasnippet-snippets yaml-mode ws-butler writeroom-mode winum white-sand-theme which-key wgrep web-mode web-beautify volatile-highlights vi-tilde-fringe uuidgen utop use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme tuareg treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil toxi-theme toc-org tide tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit symon symbol-overlay sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode seti-theme scss-mode sass-mode rjsx-mode reverse-theme reveal-in-osx-finder restart-emacs request rebecca-theme reason-mode rainbow-mode rainbow-identifiers rainbow-delimiters railscasts-theme purple-haze-theme pug-mode professional-theme prettier-js popwin planet-theme phoenix-dark-pink-theme phoenix-dark-mono-theme pcre2el password-generator paradox overseer osx-trash osx-dictionary osx-clipboard organic-green-theme org-superstar open-junk-file omtose-phellack-theme oldlace-theme ocp-indent occidental-theme obsidian-theme nodejs-repl noctilux-theme naquadah-theme nameless mustang-theme move-text monokai-theme monochrome-theme molokai-theme moe-theme modus-vivendi-theme modus-operandi-theme minimal-theme material-theme majapahit-theme magit-svn magit-section magit-gitflow madhat2r-theme macrostep lush-theme lsp-ui lsp-treemacs lsp-ivy lorem-ipsum livid-mode link-hint light-soap-theme launchctl key-chord kaolin-themes json-navigator json-mode js2-refactor js-doc jbeans-theme jazz-theme ivy-yasnippet ivy-xref ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme indent-guide impatient-mode hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme google-translate golden-ratio godoctor go-tag go-rename go-impl go-guru go-gen-test go-fill-struct go-eldoc gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ gandalf-theme fuzzy font-lock+ flycheck-pos-tip flycheck-package flycheck-ocaml flycheck-golangci-lint flycheck-elsa flycheck-bashate flx-ido flow-js2-mode flatui-theme flatland-theme fish-mode farmhouse-theme fancy-battery eziam-theme eyebrowse expand-region exotica-theme evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eslintd-fix emr emojify emoji-cheat-sheet-plus emmet-mode elisp-slime-nav editorconfig dune dumb-jump dracula-theme dotenv-mode doom-themes django-theme diminish devdocs darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme cyberpunk-theme counsel-projectile counsel-css company-web company-shell company-go company-emoji column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-identifiers-mode clues-theme chocolate-theme cherry-blossom-theme centered-cursor-mode busybee-theme bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-compile atom-one-dark-theme apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme add-node-modules-path ace-link ac-ispell))
  '(pos-tip-background-color "#222225")
  '(pos-tip-foreground-color "#c8c8d0")
  '(pytest-cmd-format-string "cd '%s' && pipenv run %s %s '%s'")
