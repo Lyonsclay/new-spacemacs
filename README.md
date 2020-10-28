@@ -52,6 +52,15 @@ In emacs themse set the colors and styling of the text and layout. I have includ
   * SPC z c [+/-]
 * Change global font
   * SPC SPC menu-set-font -- will open system fonts selector
+* One of my favorite things is checking out different color themes;
+  * An easy way to do that is to install the themes-megapack layer. It comes with hundreds of themes that are updated quite regularly.
+  * In my opinion the doom themes are quite nice and worth checking out.
+  * To see all the themes in a drop down use SPC T s, then use normal navigation or start typing a name.
+  * In order to preview a selection in your current frame there are two ways
+    1. If you use helm you can simply move to a theme and type the tab key.
+    2. If you use ivy(as I do) then you have to scroll by pressing C-M n or C-M p to see previous or next.
+  * To select a them and start using type return *note* your selection will only persist in current session.
+  * To persist a them you should add it to your init.el in the list following dotspacemacs-themes. The first one is what you will start your session with. To cycle through them use SPC T n.
 
 ### Shell Layer
 * Install vterm; it's a must have if you want to have real(meaning fast) experience.
